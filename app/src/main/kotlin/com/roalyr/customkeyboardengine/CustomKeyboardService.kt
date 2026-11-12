@@ -1,3 +1,7 @@
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 package com.roalyr.customkeyboardengine
 
 import android.content.ClipboardManager
@@ -74,11 +78,37 @@ class CustomKeyboardService : InputMethodService() {
         return inputView
     }
 
+
+    private val sizeUpdateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Handler(Looper.getMainLooper()).post { applyFloatingSizeFromPrefs() }
+        }
+    }
+
+    private fun applyFloatingSizeFromPrefs() {
+        val prefs = getSharedPreferences("keyboard_prefs", Context.MODE_PRIVATE)
+        val wPct = prefs.getInt("float_width", 60)
+        val hPct = prefs.getInt("float_height", 40)
+        screenWidth = getScreenWidth()
+        screenHeight = getScreenHeight()
+        floatingKeyboardWidth = (screenWidth * wPct / 100).toInt().coerceAtLeast(200)
+        floatingKeyboardHeight = (screenHeight * hPct / 100).toInt().coerceAtLeast(150)
+        floatingKeyboardView?.let { view ->
+            val lp = view.layoutParams as? WindowManager.LayoutParams
+            if (lp != null) {
+                lp.width = floatingKeyboardWidth
+                lp.height = floatingKeyboardHeight
+                windowManager.updateViewLayout(view, lp)
+                view.invalidateAllKeys()
+            }
+        }
+    }
     override fun onCreate() {
         initWindowManager()
         initClipboardManager()
         loadKeyboardSettings()
         CustomKeyboardClipboard.ensureMapSize(Constants.CLIPBOARD_MAX_SIZE)
+        registerReceiver(sizeUpdateReceiver, IntentFilter("com.roalyr.customkeyboardengine.UPDATE_SIZE"), Context.RECEIVER_NOT_EXPORTED)
         super.onCreate()
     }
 
@@ -95,6 +125,7 @@ class CustomKeyboardService : InputMethodService() {
     override fun onDestroy() {
         closeAllKeyboards()
         clipboardManager.removePrimaryClipChangedListener(clipboardListener)
+        unregisterReceiver(sizeUpdateReceiver)
         super.onDestroy()
     }
 
@@ -216,7 +247,7 @@ class CustomKeyboardService : InputMethodService() {
         }
         val params = WindowManager.LayoutParams(
             floatingKeyboardWidth,
-            WindowManager.LayoutParams.WRAP_CONTENT,
+            floatingKeyboardHeight,
             floatingKeyboardPosX,
             floatingKeyboardPosY,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
@@ -370,8 +401,12 @@ private fun setupDragListener() {
 
         inputView = if (isFloatingKeyboard) {
             // Check width to prevent keyboard from crossing screen
-            if (floatingKeyboardWidth == 0) {
-                floatingKeyboardWidth = (getScreenWidth() * 0.6).toInt()
+            if (floatingKeyboardWidth == 0 || floatingKeyboardHeight == 0) {
+                val _p = getSharedPreferences("keyboard_prefs", Context.MODE_PRIVATE)
+                val _w = _p.getInt("float_width", 60)
+                val _h = _p.getInt("float_height", 40)
+                if (floatingKeyboardWidth == 0) floatingKeyboardWidth = (getScreenWidth() * _w / 100).toInt().coerceAtLeast(200)
+                if (floatingKeyboardHeight == 0) floatingKeyboardHeight = (getScreenHeight() * _h / 100).toInt().coerceAtLeast(150)
             }
             if (floatingKeyboardWidth > screenWidth) {
                 floatingKeyboardWidth = getScreenWidth()
@@ -451,7 +486,7 @@ private fun setupDragListener() {
 
                 val params = WindowManager.LayoutParams(
                     floatingKeyboardWidth,
-                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    floatingKeyboardHeight,
                     floatingKeyboardPosX,
                     floatingKeyboardPosY,
                     WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,

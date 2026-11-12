@@ -1,5 +1,6 @@
 package com.roalyr.customkeyboardengine
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -25,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -177,6 +179,37 @@ class ActivityMain : ComponentActivity() {
                         )
 
                         // GitHub Link
+                        val prefs = getSharedPreferences("keyboard_prefs", Context.MODE_PRIVATE)
+                        val widthState = remember { mutableStateOf(prefs.getInt("float_width", 60).toString()) }
+                        val heightState = remember { mutableStateOf(prefs.getInt("float_height", 40).toString()) }
+
+                        OutlinedTextField(
+                            value = widthState.value,
+                            onValueChange = { widthState.value = it },
+                            label = { Text(stringResource(R.string.label_float_width)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        OutlinedTextField(
+                            value = heightState.value,
+                            onValueChange = { heightState.value = it },
+                            label = { Text(stringResource(R.string.label_float_height)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Button(
+                            onClick = {
+                                val w = widthState.value.toIntOrNull() ?: 60
+                                val h = heightState.value.toIntOrNull() ?: 40
+                                prefs.edit().putInt("float_width", w).putInt("float_height", h).apply()
+                                sendBroadcast(Intent("com.roalyr.customkeyboardengine.UPDATE_SIZE"))
+                                Toast.makeText(this@ActivityMain, getString(R.string.toast_size_applied), Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text(stringResource(R.string.btn_apply_size))
+                        }
+
+
                         Button(
                             onClick = { openUrl("https://github.com/roalyr/CustomKeyboardEngine") },
                             modifier = Modifier.fillMaxWidth(),

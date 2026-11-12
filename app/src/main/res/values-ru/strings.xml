@@ -1,0 +1,25 @@
+<resources>
+<string name="app_name">CustomKeyboardEngine</string>
+<string name="btn_grant_storage">1. Дать доступ к памяти</string>
+<string name="btn_grant_overlay">2. Разрешить поверх окон</string>
+<string name="btn_change_input">3. Выбрать клавиатуру</string>
+<string name="btn_copy_defaults">4. Скопировать раскладки</string>
+<string name="btn_copy_settings">5. Скопировать настройки</string>
+<string name="btn_github">Открыть страницу GitHub</string>
+<string name="label_working_dir">📂 Рабочая папка:</string>
+<string name="working_dir_path">/storage/emulated/0/Android/media/com.roalyr.customkeyboardengine/</string>
+<string name="hint_json_files">ℹ️ Файлы .json находятся в папке выше. Их можно редактировать в любом текстовом редакторе. Подробности в reference.md.</string>
+<string name="hint_directory">ℹ️ Если папка не создалась автоматически — создайте вручную и перезапустите приложение.</string>
+<string name="hint_test_input">Проверка ввода…</string>
+<string name="warning_backup">⚠️ ВАЖНО: Сделайте резервную копию файлов в этой папке перед удалением приложения.</string>
+<string name="toast_defaults_copied">Раскладки и справка скопированы</string>
+<string name="toast_settings_copied">settings.json скопирован</string>
+<string name="toast_settings_failed">Ошибка копирования settings.json: %1$s</string>
+<string name="toast_folder_failed">Не удалось создать рабочую папку</string>
+<string name="error_unknown_permission">Неизвестный тип разрешения</string>
+<string name="info_storage_not_required">На Android 10+ разрешение на память не требуется</string>
+<string name="label_float_width">Ширина клавиатуры (%):</string>
+<string name="label_float_height">Высота клавиатуры (%):</string>
+<string name="btn_apply_size">Применить размер</string>
+<string name="toast_size_applied">Размер применён</string>
+</resources>
