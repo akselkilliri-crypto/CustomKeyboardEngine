@@ -28,8 +28,8 @@
     <string name="toast_folder_failed">Failed to create working folder</string>
     <string name="error_unknown_permission">Unknown permission type.</string>
     <string name="info_storage_not_required">Storage permission not required for Android 10+.</string>
-    <string name=label_float_width>Floating Width (%):</string>
-<string name=label_float_height>Floating Height (%):</string>
-<string name=btn_apply_size>Apply Size</string>
-<string name=toast_size_applied>Size applied</string>
+    <string name="label_float_width">Floating Width (%):</string>
+<string name="label_float_height">Floating Height (%):</string>
+<string name="btn_apply_size">Apply Size</string>
+<string name="toast_size_applied">Size applied</string>
 </resources>
