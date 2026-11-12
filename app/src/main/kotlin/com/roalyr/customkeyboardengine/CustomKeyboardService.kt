@@ -180,6 +180,13 @@ class CustomKeyboardService : InputMethodService() {
 
 
 
+    override fun onComputeInsets(outInsets: Insets?) {
+        super.onComputeInsets(outInsets)
+        if (isFloatingKeyboardOpen || isFloatingKeyboard) {
+            outInsets?.contentTopInsets = outInsets.visibleTopInsets
+        }
+    }
+
     private fun createFloatingKeyboard() {
         if (!Settings.canDrawOverlays(this)) {
             val errorMsg = "Overlay permission denied"
@@ -202,12 +209,14 @@ class CustomKeyboardService : InputMethodService() {
             floatingKeyboardPosX,
             floatingKeyboardPosY,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSLUCENT
         )
 
         try {
             windowManager.addView(floatingKeyboardView, params)
+        floatingKeyboardView?.scaleX = 0.6f
+        floatingKeyboardView?.scaleY = 0.6f
             isFloatingKeyboardOpen = true
             floatingKeyboardView?.post { floatingKeyboardHeight = floatingKeyboardView?.measuredHeight ?: 0 }
         } catch (e: Exception) {
@@ -392,7 +401,7 @@ class CustomKeyboardService : InputMethodService() {
                     floatingKeyboardPosX,
                     floatingKeyboardPosY,
                     WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                     PixelFormat.TRANSLUCENT
                 )
 
