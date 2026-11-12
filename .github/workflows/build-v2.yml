@@ -1,4 +1,4 @@
-name: Build Keyboard APK
+name: Build Keyboard APK V2
 on:
   push:
   workflow_dispatch:
