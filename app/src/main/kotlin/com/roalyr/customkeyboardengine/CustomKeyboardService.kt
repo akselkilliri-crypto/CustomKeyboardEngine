@@ -1,9 +1,9 @@
+package com.roalyr.customkeyboardengine
+
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-package com.roalyr.customkeyboardengine
-
 import android.content.ClipboardManager
 import android.content.res.Configuration
 import android.graphics.PixelFormat
