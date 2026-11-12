@@ -11,6 +11,9 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.MotionEvent
+import android.view.ViewConfiguration
+import kotlin.math.abs
 import android.view.inputmethod.EditorInfo
 import android.os.Handler
 import android.os.Looper
@@ -205,6 +208,12 @@ class CustomKeyboardService : InputMethodService() {
             return
         }
 
+        if (floatingKeyboardPosX == 0) {
+            floatingKeyboardPosX = (screenWidth - floatingKeyboardWidth) / 2
+        }
+        if (floatingKeyboardPosY == 0) {
+            floatingKeyboardPosY = (screenHeight * 0.55).toInt()
+        }
         val params = WindowManager.LayoutParams(
             floatingKeyboardWidth,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -217,15 +226,58 @@ class CustomKeyboardService : InputMethodService() {
 
         try {
             windowManager.addView(floatingKeyboardView, params)
-        floatingKeyboardView?.scaleX = 0.6f
-        floatingKeyboardView?.scaleY = 0.6f
             isFloatingKeyboardOpen = true
+            setupDragListener()
             floatingKeyboardView?.post { floatingKeyboardHeight = floatingKeyboardView?.measuredHeight ?: 0 }
         } catch (e: Exception) {
             val errorMsg = "Failed to add floating keyboard view: ${e.message}"
             ClassFunctionsPopups.showErrorPopup(windowManager, this, TAG, errorMsg)
         }
     }
+
+private fun setupDragListener() {
+    val view = floatingKeyboardView ?: return
+    var downRawX = 0f
+    var downRawY = 0f
+    var initialX = 0
+    var initialY = 0
+    var isDragging = false
+    val touchSlop = ViewConfiguration.get(this).scaledTouchSlop
+
+    view.setOnTouchListener { v, event ->
+        val lp = v.layoutParams as? WindowManager.LayoutParams ?: return@setOnTouchListener false
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                downRawX = event.rawX
+                downRawY = event.rawY
+                initialX = lp.x
+                initialY = lp.y
+                isDragging = false
+                false
+            }
+            MotionEvent.ACTION_MOVE -> {
+                val dx = event.rawX - downRawX
+                val dy = event.rawY - downRawY
+                if (!isDragging && (abs(dx) > touchSlop || abs(dy) > touchSlop)) {
+                    isDragging = true
+                    (v as? CustomKeyboardView)?.cancelAllEvents()
+                }
+                if (isDragging) {
+                    lp.x = initialX + dx.toInt()
+                    lp.y = initialY + dy.toInt()
+                    floatingKeyboardPosX = lp.x
+                    floatingKeyboardPosY = lp.y
+                    windowManager.updateViewLayout(v, lp)
+                    true
+                } else {
+                    false
+                }
+            }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> isDragging
+            else -> false
+        }
+    }
+}
 
     private fun createStandardKeyboard(): View? {
         val rootView = inputView ?: run {
@@ -319,7 +371,7 @@ class CustomKeyboardService : InputMethodService() {
         inputView = if (isFloatingKeyboard) {
             // Check width to prevent keyboard from crossing screen
             if (floatingKeyboardWidth == 0) {
-                floatingKeyboardWidth = getScreenWidth()
+                floatingKeyboardWidth = (getScreenWidth() * 0.6).toInt()
             }
             if (floatingKeyboardWidth > screenWidth) {
                 floatingKeyboardWidth = getScreenWidth()
