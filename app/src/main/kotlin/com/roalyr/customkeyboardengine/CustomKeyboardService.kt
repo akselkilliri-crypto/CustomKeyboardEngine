@@ -183,7 +183,9 @@ class CustomKeyboardService : InputMethodService() {
     override fun onComputeInsets(outInsets: Insets?) {
         super.onComputeInsets(outInsets)
         if (isFloatingKeyboardOpen || isFloatingKeyboard) {
-            outInsets?.contentTopInsets = outInsets.visibleTopInsets
+            outInsets?.let { insets ->
+                insets.contentTopInsets = insets.visibleTopInsets
+            }
         }
     }
 
