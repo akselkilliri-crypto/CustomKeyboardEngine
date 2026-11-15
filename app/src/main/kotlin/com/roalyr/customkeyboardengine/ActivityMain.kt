@@ -239,6 +239,44 @@ class ActivityMain : ComponentActivity() {
                             )
                         }
 
+                        val bgLauncher = rememberLauncherForActivityResult(
+                            contract = ActivityResultContracts.OpenDocument()
+                        ) { uri ->
+                            if (uri != null) {
+                                try {
+                                    val dir = File(Constants.MEDIA_APP_DIRECTORY, "backgrounds")
+                                    if (!dir.exists()) dir.mkdirs()
+                                    val target = File(dir, "background.img")
+                                    contentResolver.openInputStream(uri)?.use { inp ->
+                                        target.outputStream().use { out -> inp.copyTo(out) }
+                                    }
+                                    sendBroadcast(Intent("com.roalyr.customkeyboardengine.UPDATE_BACKGROUND"))
+                                    Toast.makeText(this@ActivityMain, "Фон установлен", Toast.LENGTH_SHORT).show()
+                                } catch (e: Exception) {
+                                    Toast.makeText(this@ActivityMain, "Ошибка: " + e.message, Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+
+                        Button(
+                            onClick = { bgLauncher.launch(arrayOf("image/*")) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text("Выбрать фоновое фото")
+                        }
+
+                        Button(
+                            onClick = {
+                                val f = File(Constants.MEDIA_APP_DIRECTORY, "backgrounds/background.img")
+                                if (f.exists()) { f.delete(); sendBroadcast(Intent("com.roalyr.customkeyboardengine.UPDATE_BACKGROUND")); Toast.makeText(this@ActivityMain, "Фон удалён", Toast.LENGTH_SHORT).show() }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text("Сбросить фон")
+                        }
+
                         // GitHub Link
                         val prefs = getSharedPreferences("keyboard_prefs", Context.MODE_PRIVATE)
                         val widthState = remember { mutableStateOf(prefs.getInt("float_width", 60).toString()) }

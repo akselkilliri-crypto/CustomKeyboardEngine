@@ -3,6 +3,9 @@ package com.roalyr.customkeyboardengine
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PorterDuff
@@ -10,6 +13,7 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.os.Handler
+import java.io.File
 import android.os.Looper
 import android.util.AttributeSet
 import android.util.Log
@@ -51,6 +55,9 @@ class CustomKeyboardView @JvmOverloads constructor(
 
     // Settings from SettingsManager
     private var settings: KeyboardSettings = KeyboardSettings()
+    private var bgBitmap: Bitmap? = null
+    private var bgBitmapPath: String? = null
+    private var bgBitmapMtime: Long = 0L
 
     private var keyboardActionListener: OnKeyboardActionListener? = null
     private var isShiftOn = false
@@ -420,9 +427,37 @@ class CustomKeyboardView @JvmOverloads constructor(
         val keyModifierSmallLabelTextColor = keyboardBackgroundColor
 
 
-        // Draw keyboard background
-        paint.color = keyboardBackgroundColor
-        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+        // Draw keyboard background (image if set, otherwise solid color)
+        val bgFile = File(Constants.MEDIA_APP_DIRECTORY, "backgrounds/background.img")
+        if (bgFile.exists()) {
+            if (bgBitmap == null || bgBitmapPath != bgFile.absolutePath || bgBitmapMtime != bgFile.lastModified()) {
+                try {
+                    bgBitmap = BitmapFactory.decodeFile(bgFile.absolutePath)
+                    bgBitmapPath = bgFile.absolutePath
+                    bgBitmapMtime = bgFile.lastModified()
+                } catch (e: Exception) {
+                    Log.w("KeyboardBackground", "Failed to load bg: " + e.message)
+                }
+            }
+            bgBitmap?.let { bmp ->
+                val dstRect = RectF(0f, 0f, width.toFloat(), height.toFloat())
+                val scale = maxOf(width.toFloat() / bmp.width, height.toFloat() / bmp.height)
+                val srcW = (width / scale).toInt().coerceAtMost(bmp.width)
+                val srcH = (height / scale).toInt().coerceAtMost(bmp.height)
+                val srcRect = Rect(
+                    (bmp.width - srcW) / 2,
+                    (bmp.height - srcH) / 2,
+                    (bmp.width + srcW) / 2,
+                    (bmp.height + srcH) / 2
+                )
+                canvas.drawBitmap(bmp, srcRect, dstRect, paint)
+                paint.color = Color.argb(120, 0, 0, 0)
+                canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+            }
+        } else {
+            paint.color = keyboardBackgroundColor
+            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+        }
 
         // Scaling factors
         val scaleX = width.toFloat() / keyboard.totalLogicalWidth
