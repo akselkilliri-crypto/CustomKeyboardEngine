@@ -830,14 +830,12 @@ private fun setupDragListener() {
 
 
     private fun synchronizeClipboardKeys() {
-        val allKeys = keyboardView?.keyboard?.getAllKeys() ?: emptyList()
-
-        // Synchronize clipboard keys using the map
-        allKeys.forEach { key ->
-            if (key.keyCode == Constants.KEYCODE_CLIPBOARD_ENTRY) {
-                val label = CustomKeyboardClipboard.getClipboardEntry(key.id) ?: ""
-                key.label = label
-                //Log.i(TAG, "Synchronized clipboard key ID ${key.id} with label: '$label'")
+        listOfNotNull(keyboardView, floatingKeyboardView, serviceKeyboardView).forEach { view ->
+            view.keyboard?.getAllKeys()?.forEach { key ->
+                if (key.keyCode == Constants.KEYCODE_CLIPBOARD_ENTRY) {
+                    val label = CustomKeyboardClipboard.getClipboardEntry(key.id) ?: ""
+                    key.label = label
+                }
             }
         }
         invalidateAllKeysOnAllKeyboards()
