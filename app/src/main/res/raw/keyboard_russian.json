@@ -1,0 +1,300 @@
+{
+  "defaultKeyWidth": 10,
+  "defaultKeyHeight": 45,
+  "rows": [
+    {
+      "defaultKeyWidth": 8.333,
+      "keys": [
+        {
+          "label": "Es",
+          "keyCode": 111,
+          "isModifier": true
+        },
+        {
+          "label": "1",
+          "labelLongPress": "!"
+        },
+        {
+          "label": "2",
+          "labelLongPress": "@"
+        },
+        {
+          "label": "3",
+          "labelLongPress": "#"
+        },
+        {
+          "label": "4",
+          "labelLongPress": "$"
+        },
+        {
+          "label": "5",
+          "labelLongPress": "%"
+        },
+        {
+          "label": "6",
+          "labelLongPress": "^"
+        },
+        {
+          "label": "7",
+          "labelLongPress": "&"
+        },
+        {
+          "label": "8",
+          "labelLongPress": "*"
+        },
+        {
+          "label": "9",
+          "labelLongPress": "("
+        },
+        {
+          "label": "0",
+          "labelLongPress": ")"
+        },
+        {
+          "label": "Del",
+          "keyCode": 112,
+          "isModifier": true,
+          "isRepeatable": true
+        }
+      ]
+    },
+    {
+      "defaultKeyWidth": 10,
+      "keys": [
+        {
+          "icon": "@drawable/ic_tab",
+          "keyCode": 61,
+          "isModifier": true,
+          "keyWidth": 15
+        },
+        {
+          "label": "х",
+          "labelLongPress": "~"
+        },
+        {
+          "label": "ъ",
+          "labelLongPress": "{"
+        },
+        {
+          "label": "э",
+          "labelLongPress": "}"
+        },
+        {
+          "label": "'",
+          "labelLongPress": "\""
+        },
+        {
+          "label": "\\",
+          "labelLongPress": "|"
+        },
+        {
+          "label": "-",
+          "labelLongPress": "_"
+        },
+        {
+          "label": "=",
+          "labelLongPress": "+"
+        },
+        {
+          "icon": "@drawable/ic_backspace",
+          "keyCode": 67,
+          "isModifier": true,
+          "isRepeatable": true,
+          "keyWidth": 15
+        }
+      ]
+    },
+    {
+      "keys": [
+        {
+          "label": "й"
+        },
+        {
+          "label": "ц"
+        },
+        {
+          "label": "у"
+        },
+        {
+          "label": "к"
+        },
+        {
+          "label": "е"
+        },
+        {
+          "label": "н"
+        },
+        {
+          "label": "г"
+        },
+        {
+          "label": "ш"
+        },
+        {
+          "label": "щ"
+        },
+        {
+          "label": "з"
+        }
+      ]
+    },
+    {
+      "keys": [
+        {
+          "label": "ф"
+        },
+        {
+          "label": "ы"
+        },
+        {
+          "label": "в"
+        },
+        {
+          "label": "а"
+        },
+        {
+          "label": "п"
+        },
+        {
+          "label": "р"
+        },
+        {
+          "label": "о"
+        },
+        {
+          "label": "л"
+        },
+        {
+          "label": "д"
+        },
+        {
+          "label": "ж",
+          "labelLongPress": ":"
+        }
+      ]
+    },
+    {
+      "keys": [
+        {
+          "label": "я"
+        },
+        {
+          "label": "ч"
+        },
+        {
+          "label": "с"
+        },
+        {
+          "label": "м"
+        },
+        {
+          "label": "и"
+        },
+        {
+          "label": "т"
+        },
+        {
+          "label": "ь"
+        },
+        {
+          "label": "б",
+          "labelLongPress": "<"
+        },
+        {
+          "label": "ю",
+          "labelLongPress": ">"
+        },
+        {
+          "label": ".",
+          "labelLongPress": "?"
+        }
+      ]
+    },
+    {
+      "defaultKeyWidth": 11.667,
+      "keys": [
+        {
+          "label": "shf",
+          "keyCode": 59,
+          "labelLongPress": "cap",
+          "keyCodeLongPress": 115,
+          "isModifier": true
+        },
+        {
+          "label": "ctl",
+          "keyCode": 113,
+          "isModifier": true
+        },
+        {
+          "label": "alt",
+          "keyCode": 57,
+          "isModifier": true
+        },
+        {
+          "label": "⎵",
+          "keyCode": 62,
+          "keyWidth": 30,
+          "keyHeight": 93,
+          "isRepeatable": true
+        },
+        {
+          "icon": "@drawable/ic_emoji",
+          "keyCode": -1,
+          "isModifier": true
+        },
+        {
+          "icon": "@drawable/ic_up_triangle_arrow",
+          "keyCode": 19,
+          "isModifier": true,
+          "isRepeatable": true
+        },
+        {
+          "label": "Ent",
+          "keyCode": 66,
+          "isModifier": true
+        }
+      ]
+    },
+    {
+      "defaultKeyWidth": 11.667,
+      "keys": [
+        {
+          "icon": "@drawable/ic_anchor",
+          "keyCode": -12,
+          "isModifier": true
+        },
+        {
+          "icon": "@drawable/ic_clipboard",
+          "keyCode": -24,
+          "isModifier": true
+        },
+        {
+          "label": "en",
+          "labelLongPress": "var",
+          "keyCode": -21,
+          "keyCodeLongPress": -1,
+          "isModifier": true,
+          "logicalKeyGap": 30
+        },
+        {
+          "icon": "@drawable/ic_left_triangle_arrow",
+          "keyCode": 21,
+          "isModifier": true,
+          "isRepeatable": true
+        },
+        {
+          "icon": "@drawable/ic_down_triangle_arrow",
+          "keyCode": 20,
+          "isModifier": true,
+          "isRepeatable": true
+        },
+        {
+          "icon": "@drawable/ic_right_triangle_arrow",
+          "keyCode": 22,
+          "isModifier": true,
+          "isRepeatable": true
+        }
+      ]
+    }
+  ]
+}

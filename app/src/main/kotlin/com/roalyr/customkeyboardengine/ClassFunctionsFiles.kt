@@ -63,6 +63,13 @@ class ClassFunctionsFiles {
                     windowManager,
                     resources
                 )
+                copyDefaultFileAlways(
+                    "${languageDir.absolutePath}/keyboard_russian.json",
+                    R.raw.keyboard_russian,
+                    context,
+                    windowManager,
+                    resources
+                ),
             ).all { it } // Return true only if all operations succeeded
         }
 

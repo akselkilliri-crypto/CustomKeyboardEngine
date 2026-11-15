@@ -3,10 +3,14 @@ package com.roalyr.customkeyboardengine
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.OpenableColumns
+
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +28,9 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -178,6 +184,61 @@ class ActivityMain : ComponentActivity() {
                             modifier = Modifier.fillMaxWidth()
                         )
 
+                        val pendingUri = remember { mutableStateOf<Uri?>(null) }
+                        val pendingName = remember { mutableStateOf<String?>(null) }
+                        val showReplaceDialog = remember { mutableStateOf(false) }
+                        val showErrorDialog = remember { mutableStateOf<String?>(null) }
+
+                        val importLauncher = rememberLauncherForActivityResult(
+                            contract = ActivityResultContracts.OpenDocument()
+                        ) { uri ->
+                            if (uri != null) {
+                                when (val r = this@ActivityMain.importLayoutFromUri(uri, false)) {
+                                    is ImportResult.Success -> Toast.makeText(this@ActivityMain, "Загружено: " + r.fileName, Toast.LENGTH_SHORT).show()
+                                    is ImportResult.Exists -> { pendingUri.value = uri; pendingName.value = r.fileName; showReplaceDialog.value = true }
+                                    is ImportResult.Error -> { showErrorDialog.value = r.message }
+                                }
+                            }
+                        }
+
+                        Button(
+                            onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "/")) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text("Загрузить раскладку")
+                        }
+
+                        if (showReplaceDialog.value) {
+                            AlertDialog(
+                                onDismissRequest = { showReplaceDialog.value = false; pendingUri.value = null },
+                                title = { Text("Заменить раскладку?") },
+                                text = { Text("Раскладка " + (pendingName.value ?: "") + " уже существует. Заменить?") },
+                                confirmButton = {
+                                    TextButton(onClick = {
+                                        pendingUri.value?.let { this@ActivityMain.importLayoutFromUri(it, true) }
+                                        showReplaceDialog.value = false
+                                        pendingUri.value = null
+                                        Toast.makeText(this@ActivityMain, "Раскладка заменена", Toast.LENGTH_SHORT).show()
+                                    }) { Text("Заменить") }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { showReplaceDialog.value = false; pendingUri.value = null }) { Text("Отмена") }
+                                }
+                            )
+                        }
+
+                        if (showErrorDialog.value != null) {
+                            AlertDialog(
+                                onDismissRequest = { showErrorDialog.value = null },
+                                title = { Text("Ошибка") },
+                                text = { Text(showErrorDialog.value ?: "") },
+                                confirmButton = {
+                                    TextButton(onClick = { showErrorDialog.value = null }) { Text("OK") }
+                                }
+                            )
+                        }
+
                         // GitHub Link
                         val prefs = getSharedPreferences("keyboard_prefs", Context.MODE_PRIVATE)
                         val widthState = remember { mutableStateOf(prefs.getInt("float_width", 60).toString()) }
@@ -277,6 +338,49 @@ class ActivityMain : ComponentActivity() {
             Toast.makeText(this, getString(R.string.toast_settings_copied), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(this, getString(R.string.toast_settings_failed, e.message), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    sealed class ImportResult {
+        data class Success(val fileName: String) : ImportResult()
+        data class Exists(val fileName: String) : ImportResult()
+        data class Error(val message: String) : ImportResult()
+    }
+
+    private fun importLayoutFromUri(uri: Uri, overwrite: Boolean): ImportResult {
+        return try {
+            var displayName: String? = null
+            contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                val idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (idx >= 0 && cursor.moveToFirst()) displayName = cursor.getString(idx)
+            }
+            val rawName = displayName ?: "layout_${System.currentTimeMillis()}.json"
+            val fileName = if (rawName.endsWith(".json", ignoreCase = true)) rawName else "$rawName.json"
+
+            val targetDir = File(Constants.MEDIA_LAYOUTS_LANGUAGE_DIRECTORY)
+            if (!targetDir.exists() && !targetDir.mkdirs()) {
+                return ImportResult.Error("Не удалось создать папку раскладок")
+            }
+            val targetFile = File(targetDir, fileName)
+
+            if (targetFile.exists() && !overwrite) {
+                return ImportResult.Exists(fileName)
+            }
+
+            val content = contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                ?: return ImportResult.Error("Не удалось прочитать файл")
+
+            try {
+                kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+                    .decodeFromString<KeyboardLayout>(content)
+            } catch (e: Exception) {
+                return ImportResult.Error("Неверный формат JSON: ${e.message}")
+            }
+
+            targetFile.writeText(content)
+            ImportResult.Success(fileName)
+        } catch (e: Exception) {
+            ImportResult.Error("Ошибка: ${e.message}")
         }
     }
 }
