@@ -255,25 +255,38 @@ class ActivityMain : ComponentActivity() {
 
                         val colorPickerTarget = remember { mutableStateOf<String?>(null) }
 
-                        @Composable
-                        fun ColorButton(label: String, value: String) {
-                            Button(
-                                onClick = { colorPickerTarget.value = label },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = MaterialTheme.shapes.medium
-                            ) {
-                                val c = if (value.isEmpty()) androidx.compose.ui.graphics.Color.Gray
-                                    else try { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(value)) }
-                                    catch (e: Exception) { androidx.compose.ui.graphics.Color.Gray }
-                                Box(modifier = Modifier.size(20.dp).background(c, androidx.compose.foundation.shape.CircleShape))
-                                Spacer(modifier = Modifier.size(8.dp))
-                                Text(label + (if (value.isEmpty()) " (авто)" else ""))
-                            }
+                        Button(
+                            onClick = { colorPickerTarget.value = "Цвет клавиш" },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            val _c = if (bgColorState.value.isEmpty()) androidx.compose.ui.graphics.Color.Gray else try { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(bgColorState.value)) } catch (e: Exception) { androidx.compose.ui.graphics.Color.Gray }
+                            Box(modifier = Modifier.size(20.dp).background(_c, androidx.compose.foundation.shape.CircleShape))
+                            Spacer(modifier = Modifier.size(8.dp))
+                            Text("Цвет клавиш" + (if (bgColorState.value.isEmpty()) " (авто)" else ""))
                         }
 
-                        ColorButton("Цвет клавиш", bgColorState.value)
-                        ColorButton("Цвет букв", textColorState.value)
-                        ColorButton("Цвет контура", borderColorState.value)
+                        Button(
+                            onClick = { colorPickerTarget.value = "Цвет букв" },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            val _c = if (textColorState.value.isEmpty()) androidx.compose.ui.graphics.Color.Gray else try { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(textColorState.value)) } catch (e: Exception) { androidx.compose.ui.graphics.Color.Gray }
+                            Box(modifier = Modifier.size(20.dp).background(_c, androidx.compose.foundation.shape.CircleShape))
+                            Spacer(modifier = Modifier.size(8.dp))
+                            Text("Цвет букв" + (if (textColorState.value.isEmpty()) " (авто)" else ""))
+                        }
+
+                        Button(
+                            onClick = { colorPickerTarget.value = "Цвет контура" },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            val _c = if (borderColorState.value.isEmpty()) androidx.compose.ui.graphics.Color.Gray else try { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(borderColorState.value)) } catch (e: Exception) { androidx.compose.ui.graphics.Color.Gray }
+                            Box(modifier = Modifier.size(20.dp).background(_c, androidx.compose.foundation.shape.CircleShape))
+                            Spacer(modifier = Modifier.size(8.dp))
+                            Text("Цвет контура" + (if (borderColorState.value.isEmpty()) " (авто)" else ""))
+                        }
 
                         Text("Прозрачность клавиш: " + alphaState.value.toInt() + "/255", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
                         Slider(value = alphaState.value, onValueChange = { alphaState.value = it }, valueRange = 0f..255f, modifier = Modifier.fillMaxWidth())
