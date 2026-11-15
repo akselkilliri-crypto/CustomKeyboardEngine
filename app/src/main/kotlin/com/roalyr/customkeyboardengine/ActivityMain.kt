@@ -12,10 +12,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -250,9 +253,27 @@ class ActivityMain : ComponentActivity() {
 
                         Text("Оформление клавиатуры", fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
 
-                        OutlinedTextField(value = bgColorState.value, onValueChange = { bgColorState.value = it }, label = { Text("Цвет клавиш (#RRGGBB, пусто=авто)") }, modifier = Modifier.fillMaxWidth())
-                        OutlinedTextField(value = textColorState.value, onValueChange = { textColorState.value = it }, label = { Text("Цвет букв (#RRGGBB, пусто=авто)") }, modifier = Modifier.fillMaxWidth())
-                        OutlinedTextField(value = borderColorState.value, onValueChange = { borderColorState.value = it }, label = { Text("Цвет контура (#RRGGBB, пусто=нет)") }, modifier = Modifier.fillMaxWidth())
+                        val colorPickerTarget = remember { mutableStateOf<String?>(null) }
+
+                        @Composable
+                        fun ColorButton(label: String, value: String) {
+                            Button(
+                                onClick = { colorPickerTarget.value = label },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = MaterialTheme.shapes.medium
+                            ) {
+                                val c = if (value.isEmpty()) androidx.compose.ui.graphics.Color.Gray
+                                    else try { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(value)) }
+                                    catch (e: Exception) { androidx.compose.ui.graphics.Color.Gray }
+                                Box(modifier = Modifier.size(20.dp).background(c, androidx.compose.foundation.shape.CircleShape))
+                                Spacer(modifier = Modifier.size(8.dp))
+                                Text(label + (if (value.isEmpty()) " (авто)" else ""))
+                            }
+                        }
+
+                        ColorButton("Цвет клавиш", bgColorState.value)
+                        ColorButton("Цвет букв", textColorState.value)
+                        ColorButton("Цвет контура", borderColorState.value)
 
                         Text("Прозрачность клавиш: " + alphaState.value.toInt() + "/255", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
                         Slider(value = alphaState.value, onValueChange = { alphaState.value = it }, valueRange = 0f..255f, modifier = Modifier.fillMaxWidth())
@@ -300,6 +321,46 @@ class ActivityMain : ComponentActivity() {
                         ) {
                             Text("Сбросить стиль")
                         }
+
+                        if (colorPickerTarget.value != null) {
+                            val palette = listOf("", "#FFFFFF", "#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF", "#FFA500", "#800080", "#FFC0CB", "#808080", "#A52A2A", "#000080", "#008000", "#800000", "#808000", "#FFD700", "#4B0082", "#EE82EE", "#40E0D0", "#F5DEB3", "#2F4F4F", "#1E90FF", "#32CD32", "#FF6347", "#9370DB", "#20B2AA", "#DC143C")
+                            AlertDialog(
+                                onDismissRequest = { colorPickerTarget.value = null },
+                                title = { Text("Выбор цвета: " + (colorPickerTarget.value ?: "")) },
+                                text = {
+                                    Column {
+                                        palette.chunked(6).forEach { rowColors ->
+                                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(vertical = 2.dp)) {
+                                                rowColors.forEach { c ->
+                                                    val displayColor = if (c.isEmpty()) androidx.compose.ui.graphics.Color.Transparent
+                                                        else try { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(c)) }
+                                                        catch (e: Exception) { androidx.compose.ui.graphics.Color.Gray }
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(40.dp)
+                                                            .background(displayColor, androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
+                                                            .clickable {
+                                                                val v = colorPickerTarget.value
+                                                                if (v == "Цвет клавиш") bgColorState.value = c
+                                                                else if (v == "Цвет букв") textColorState.value = c
+                                                                else if (v == "Цвет контура") borderColorState.value = c
+                                                                colorPickerTarget.value = null
+                                                            },
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        if (c.isEmpty()) Text("авто", fontSize = 9.sp)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                confirmButton = {
+                                    TextButton(onClick = { colorPickerTarget.value = null }) { Text("Закрыть") }
+                                }
+                            )
+                        }
+
 
                         val bgLauncher = rememberLauncherForActivityResult(
                             contract = ActivityResultContracts.OpenDocument()

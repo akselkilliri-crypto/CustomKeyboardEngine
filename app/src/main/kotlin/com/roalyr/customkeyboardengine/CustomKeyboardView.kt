@@ -416,7 +416,7 @@ class CustomKeyboardView @JvmOverloads constructor(
 
         val keyboardBackgroundColor = if (isDarkTheme) adjustColor(accentColor, 0.2f, 0.6f) else adjustColor(accentColor, 0.99f, 0.2f)
         var keyBackgroundColor = if (isDarkTheme) adjustColor(accentColor, 0.25f, 0.4f) else adjustColor(accentColor, 1.0f, 0.1f)
-        val keyModifierBackgroundColor = if (isDarkTheme) adjustColor(accentColor, 1.2f, 0.7f) else adjustColor(accentColor, 1.0f, 1.0f)
+        var keyModifierBackgroundColor = if (isDarkTheme) adjustColor(accentColor, 1.2f, 0.7f) else adjustColor(accentColor, 1.0f, 1.0f)
         var keyLabelTextColor = if (isDarkTheme) Constants.TEXT_COLOR_DARK_THEME else Constants.TEXT_COLOR_LIGHT_THEME
 
         // Custom style overrides from prefs
@@ -430,6 +430,7 @@ class CustomKeyboardView @JvmOverloads constructor(
             ColorUtils.parseHexColor(_customKeyBg)?.let { keyBackgroundColor = it }
         }
         keyBackgroundColor = (keyBackgroundColor and 0x00FFFFFF) or (_bgAlpha shl 24)
+        keyModifierBackgroundColor = (keyModifierBackgroundColor and 0x00FFFFFF) or (_bgAlpha shl 24)
         if (_customKeyText.isNotEmpty()) {
             ColorUtils.parseHexColor(_customKeyText)?.let { keyLabelTextColor = it }
         }
