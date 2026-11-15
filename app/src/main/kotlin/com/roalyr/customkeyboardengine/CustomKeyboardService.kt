@@ -273,7 +273,7 @@ private fun setupDragListener() {
     var initialX = 0
     var initialY = 0
     var isDragging = false
-    val touchSlop = ViewConfiguration.get(this).scaledTouchSlop
+    val touchSlop = ViewConfiguration.get(this).scaledTouchSlop * 3
 
     view.setOnTouchListener { v, event ->
         val lp = v.layoutParams as? WindowManager.LayoutParams ?: return@setOnTouchListener false

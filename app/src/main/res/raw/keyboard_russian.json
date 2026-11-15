@@ -202,11 +202,11 @@
         },
         {
           "label": "ю",
-          "labelLongPress": ">"
+          "labelLongPress": ","
         },
         {
           "label": ".",
-          "labelLongPress": "?"
+          "labelLongPress": ","
         }
       ]
     },
