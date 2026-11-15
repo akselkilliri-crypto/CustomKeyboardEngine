@@ -441,10 +441,10 @@ class CustomKeyboardView @JvmOverloads constructor(
             ColorUtils.parseHexColor(_customKeyText)?.let { keyLabelTextColor = it }
         }
         val customBorderColor = if (_customKeyBorder.isNotEmpty()) ColorUtils.parseHexColor(_customKeyBorder) else null
+        var keyLabelLongPressTextColor = if (isDarkTheme) adjustColor(accentColor, 1.4f, 0.9f) else adjustColor(accentColor, 0.95f, 1.0f)
         if (_customLongPress.isNotEmpty()) {
             ColorUtils.parseHexColor(_customLongPress)?.let { keyLabelLongPressTextColor = it }
         }
-        var keyLabelLongPressTextColor = if (isDarkTheme) adjustColor(accentColor, 1.4f, 0.9f) else adjustColor(accentColor, 0.95f, 1.0f)
 
         // Keep those values the same as text or background colors.
         val keyIconColor = keyLabelTextColor
