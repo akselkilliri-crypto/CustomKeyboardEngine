@@ -202,7 +202,7 @@ class ActivityMain : ComponentActivity() {
                         }
 
                         Button(
-                            onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "/")) },
+                            onClick = { importLauncher.launch(arrayOf("application/json", "text/plain", "*/*")) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.medium
                         ) {
