@@ -32,6 +32,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
@@ -237,6 +238,67 @@ class ActivityMain : ComponentActivity() {
                                     TextButton(onClick = { showErrorDialog.value = null }) { Text("OK") }
                                 }
                             )
+                        }
+
+                        // ---- STYLE SECTION ----
+                        val stylePrefs = getSharedPreferences("keyboard_prefs", Context.MODE_PRIVATE)
+                        val bgColorState = remember { mutableStateOf(stylePrefs.getString("custom_key_bg_color", "") ?: "") }
+                        val textColorState = remember { mutableStateOf(stylePrefs.getString("custom_key_text_color", "") ?: "") }
+                        val borderColorState = remember { mutableStateOf(stylePrefs.getString("custom_key_border_color", "") ?: "") }
+                        val alphaState = remember { mutableStateOf(stylePrefs.getInt("custom_key_bg_alpha", 255).toFloat()) }
+                        val borderWidthState = remember { mutableStateOf(stylePrefs.getInt("custom_key_border_width", 0).toFloat()) }
+
+                        Text("Оформление клавиатуры", fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+
+                        OutlinedTextField(value = bgColorState.value, onValueChange = { bgColorState.value = it }, label = { Text("Цвет клавиш (#RRGGBB, пусто=авто)") }, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(value = textColorState.value, onValueChange = { textColorState.value = it }, label = { Text("Цвет букв (#RRGGBB, пусто=авто)") }, modifier = Modifier.fillMaxWidth())
+                        OutlinedTextField(value = borderColorState.value, onValueChange = { borderColorState.value = it }, label = { Text("Цвет контура (#RRGGBB, пусто=нет)") }, modifier = Modifier.fillMaxWidth())
+
+                        Text("Прозрачность клавиш: " + alphaState.value.toInt() + "/255", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
+                        Slider(value = alphaState.value, onValueChange = { alphaState.value = it }, valueRange = 0f..255f, modifier = Modifier.fillMaxWidth())
+
+                        Text("Толщина контура: " + borderWidthState.value.toInt() + " px", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
+                        Slider(value = borderWidthState.value, onValueChange = { borderWidthState.value = it }, valueRange = 0f..20f, modifier = Modifier.fillMaxWidth())
+
+                        Button(
+                            onClick = {
+                                stylePrefs.edit()
+                                    .putString("custom_key_bg_color", bgColorState.value.trim())
+                                    .putString("custom_key_text_color", textColorState.value.trim())
+                                    .putString("custom_key_border_color", borderColorState.value.trim())
+                                    .putInt("custom_key_bg_alpha", alphaState.value.toInt())
+                                    .putInt("custom_key_border_width", borderWidthState.value.toInt())
+                                    .apply()
+                                sendBroadcast(Intent("com.roalyr.customkeyboardengine.UPDATE_BACKGROUND"))
+                                Toast.makeText(this@ActivityMain, "Стиль применён", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text("Применить стиль")
+                        }
+
+                        Button(
+                            onClick = {
+                                stylePrefs.edit()
+                                    .putString("custom_key_bg_color", "")
+                                    .putString("custom_key_text_color", "")
+                                    .putString("custom_key_border_color", "")
+                                    .putInt("custom_key_bg_alpha", 255)
+                                    .putInt("custom_key_border_width", 0)
+                                    .apply()
+                                bgColorState.value = ""
+                                textColorState.value = ""
+                                borderColorState.value = ""
+                                alphaState.value = 255f
+                                borderWidthState.value = 0f
+                                sendBroadcast(Intent("com.roalyr.customkeyboardengine.UPDATE_BACKGROUND"))
+                                Toast.makeText(this@ActivityMain, "Стиль сброшен", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text("Сбросить стиль")
                         }
 
                         val bgLauncher = rememberLauncherForActivityResult(

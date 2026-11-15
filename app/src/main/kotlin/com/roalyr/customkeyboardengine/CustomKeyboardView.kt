@@ -415,9 +415,25 @@ class CustomKeyboardView @JvmOverloads constructor(
         }
 
         val keyboardBackgroundColor = if (isDarkTheme) adjustColor(accentColor, 0.2f, 0.6f) else adjustColor(accentColor, 0.99f, 0.2f)
-        val keyBackgroundColor = if (isDarkTheme) adjustColor(accentColor, 0.25f, 0.4f) else adjustColor(accentColor, 1.0f, 0.1f)
+        var keyBackgroundColor = if (isDarkTheme) adjustColor(accentColor, 0.25f, 0.4f) else adjustColor(accentColor, 1.0f, 0.1f)
         val keyModifierBackgroundColor = if (isDarkTheme) adjustColor(accentColor, 1.2f, 0.7f) else adjustColor(accentColor, 1.0f, 1.0f)
-        val keyLabelTextColor = if (isDarkTheme) Constants.TEXT_COLOR_DARK_THEME else Constants.TEXT_COLOR_LIGHT_THEME
+        var keyLabelTextColor = if (isDarkTheme) Constants.TEXT_COLOR_DARK_THEME else Constants.TEXT_COLOR_LIGHT_THEME
+
+        // Custom style overrides from prefs
+        val _prefs = context.getSharedPreferences("keyboard_prefs", Context.MODE_PRIVATE)
+        val _customKeyBg = _prefs.getString("custom_key_bg_color", "") ?: ""
+        val _customKeyText = _prefs.getString("custom_key_text_color", "") ?: ""
+        val _customKeyBorder = _prefs.getString("custom_key_border_color", "") ?: ""
+        val _bgAlpha = _prefs.getInt("custom_key_bg_alpha", 255).coerceIn(0, 255)
+        val _borderW = _prefs.getInt("custom_key_border_width", 0).coerceIn(0, 20)
+        if (_customKeyBg.isNotEmpty()) {
+            ColorUtils.parseHexColor(_customKeyBg)?.let { keyBackgroundColor = it }
+        }
+        keyBackgroundColor = (keyBackgroundColor and 0x00FFFFFF) or (_bgAlpha shl 24)
+        if (_customKeyText.isNotEmpty()) {
+            ColorUtils.parseHexColor(_customKeyText)?.let { keyLabelTextColor = it }
+        }
+        val customBorderColor = if (_customKeyBorder.isNotEmpty()) ColorUtils.parseHexColor(_customKeyBorder) else null
         val keyLabelLongPressTextColor = if (isDarkTheme) adjustColor(accentColor, 1.4f, 0.9f) else adjustColor(accentColor, 0.95f, 1.0f)
 
         // Keep those values the same as text or background colors.
@@ -494,6 +510,13 @@ class CustomKeyboardView @JvmOverloads constructor(
                 // Draw key background
                 paint.color = if (key.isModifier == true) keyModifierBackgroundColor else keyBackgroundColor
                 canvas.drawRoundRect(keyBounds, cornerRadius, cornerRadius, paint)
+                if (customBorderColor != null && _borderW > 0) {
+                    paint.style = Paint.Style.STROKE
+                    paint.strokeWidth = _borderW.toFloat()
+                    paint.color = customBorderColor
+                    canvas.drawRoundRect(keyBounds, cornerRadius, cornerRadius, paint)
+                    paint.style = Paint.Style.FILL
+                }
 
                 // --- Draw content if any ---
                 if (shouldRenderKey(key)) {
