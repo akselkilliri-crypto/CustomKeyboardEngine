@@ -819,7 +819,9 @@ private fun setupDragListener() {
         }
 
         // Invalidate and synchronize clipboard keys if they exist
-        if (keyboardView?.keyboard?.getAllKeys()?.any { it.keyCode == Constants.KEYCODE_CLIPBOARD_ENTRY } == true) {
+        val anyHasClipboard = listOfNotNull(keyboardView, floatingKeyboardView, serviceKeyboardView)
+            .any { it.keyboard?.getAllKeys()?.any { k -> k.keyCode == Constants.KEYCODE_CLIPBOARD_ENTRY } == true }
+        if (anyHasClipboard) {
             synchronizeClipboardKeys()
         } else {
             //Log.i(TAG, "No clipboard keys found in the current layout.")
