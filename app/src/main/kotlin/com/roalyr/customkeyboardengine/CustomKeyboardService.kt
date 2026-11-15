@@ -85,6 +85,12 @@ class CustomKeyboardService : InputMethodService() {
         }
     }
 
+    private val bgUpdateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Handler(Looper.getMainLooper()).post { invalidateAllKeysOnAllKeyboards() }
+        }
+    }
+
     private fun applyFloatingSizeFromPrefs() {
         val prefs = getSharedPreferences("keyboard_prefs", Context.MODE_PRIVATE)
         val wPct = prefs.getInt("float_width", 60)
@@ -109,6 +115,7 @@ class CustomKeyboardService : InputMethodService() {
         loadKeyboardSettings()
         CustomKeyboardClipboard.ensureMapSize(Constants.CLIPBOARD_MAX_SIZE)
         registerReceiver(sizeUpdateReceiver, IntentFilter("com.roalyr.customkeyboardengine.UPDATE_SIZE"), Context.RECEIVER_NOT_EXPORTED)
+        registerReceiver(bgUpdateReceiver, IntentFilter("com.roalyr.customkeyboardengine.UPDATE_BACKGROUND"), Context.RECEIVER_NOT_EXPORTED)
         super.onCreate()
     }
 
@@ -126,6 +133,7 @@ class CustomKeyboardService : InputMethodService() {
         closeAllKeyboards()
         clipboardManager.removePrimaryClipChangedListener(clipboardListener)
         unregisterReceiver(sizeUpdateReceiver)
+        unregisterReceiver(bgUpdateReceiver)
         super.onDestroy()
     }
 
