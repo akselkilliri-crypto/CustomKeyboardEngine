@@ -253,6 +253,7 @@ class ActivityMain : ComponentActivity() {
                         val modBgState = remember { mutableStateOf(stylePrefs.getString("custom_mod_bg_color", "") ?: "") }
                         val modAlphaState = remember { mutableStateOf(stylePrefs.getInt("custom_mod_bg_alpha", 255).toFloat()) }
                         val longPressState = remember { mutableStateOf(stylePrefs.getString("custom_longpress_color", "") ?: "") }
+                        val modTextState = remember { mutableStateOf(stylePrefs.getString("custom_mod_text_color", "") ?: "") }
 
                         Text("Оформление клавиатуры", fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
 
@@ -312,6 +313,16 @@ class ActivityMain : ComponentActivity() {
                             Text("Цвет вторых символов" + (if (longPressState.value.isEmpty()) " (авто)" else ""))
                         }
                         Text("Прозрачность клавиш: " + alphaState.value.toInt() + "/255", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
+                        Button(
+                            onClick = { colorPickerTarget.value = "Цвет символов модификаторов" },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            val _c = if (modTextState.value.isEmpty()) androidx.compose.ui.graphics.Color.Gray else try { androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(modTextState.value)) } catch (e: Exception) { androidx.compose.ui.graphics.Color.Gray }
+                            Box(modifier = Modifier.size(20.dp).background(_c, androidx.compose.foundation.shape.CircleShape))
+                            Spacer(modifier = Modifier.size(8.dp))
+                            Text("Цвет символов модификаторов" + (if (modTextState.value.isEmpty()) " (авто)" else ""))
+                        }
                         Slider(value = alphaState.value, onValueChange = { alphaState.value = it }, valueRange = 0f..255f, modifier = Modifier.fillMaxWidth())
 
                         Text("Толщина контура: " + borderWidthState.value.toInt() + " px", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
@@ -330,6 +341,7 @@ class ActivityMain : ComponentActivity() {
                                     .putString("custom_mod_bg_color", modBgState.value.trim())
                                     .putInt("custom_mod_bg_alpha", modAlphaState.value.toInt())
                                     .putString("custom_longpress_color", longPressState.value.trim())
+                                    .putString("custom_mod_text_color", modTextState.value.trim())
                                     .apply()
                                 sendBroadcast(Intent("com.roalyr.customkeyboardengine.UPDATE_BACKGROUND"))
                                 Toast.makeText(this@ActivityMain, "Стиль применён", Toast.LENGTH_SHORT).show()
@@ -351,6 +363,7 @@ class ActivityMain : ComponentActivity() {
                                     .putString("custom_mod_bg_color", "")
                                     .putInt("custom_mod_bg_alpha", 255)
                                     .putString("custom_longpress_color", "")
+                                    .putString("custom_mod_text_color", "")
                                     .apply()
                                 bgColorState.value = ""
                                 textColorState.value = ""
@@ -360,6 +373,7 @@ class ActivityMain : ComponentActivity() {
                                 modBgState.value = ""
                                 modAlphaState.value = 255f
                                 longPressState.value = ""
+                                modTextState.value = ""
                                 sendBroadcast(Intent("com.roalyr.customkeyboardengine.UPDATE_BACKGROUND"))
                                 Toast.makeText(this@ActivityMain, "Стиль сброшен", Toast.LENGTH_SHORT).show()
                             },
@@ -393,6 +407,7 @@ class ActivityMain : ComponentActivity() {
                                                                 else if (v == "Цвет контура") borderColorState.value = c
                                                                 else if (v == "Цвет модификаторов") modBgState.value = c
                                                                 else if (v == "Цвет вторых символов") longPressState.value = c
+                                                                else if (v == "Цвет символов модификаторов") modTextState.value = c
                                                                 colorPickerTarget.value = null
                                                             },
                                                         contentAlignment = Alignment.Center
