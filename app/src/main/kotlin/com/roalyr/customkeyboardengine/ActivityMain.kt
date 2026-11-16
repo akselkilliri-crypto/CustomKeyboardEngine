@@ -254,6 +254,7 @@ class ActivityMain : ComponentActivity() {
                         val modAlphaState = remember { mutableStateOf(stylePrefs.getInt("custom_mod_bg_alpha", 255).toFloat()) }
                         val longPressState = remember { mutableStateOf(stylePrefs.getString("custom_longpress_color", "") ?: "") }
                         val modTextState = remember { mutableStateOf(stylePrefs.getString("custom_mod_text_color", "") ?: "") }
+                        val bgOverlayState = remember { mutableStateOf(stylePrefs.getInt("bg_overlay_alpha", 120).toFloat()) }
 
                         Text("Оформление клавиатуры", fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
 
@@ -330,6 +331,9 @@ class ActivityMain : ComponentActivity() {
                         Text("Прозрачность модификаторов: " + modAlphaState.value.toInt() + "/255", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
                         Slider(value = modAlphaState.value, onValueChange = { modAlphaState.value = it }, valueRange = 0f..255f, modifier = Modifier.fillMaxWidth())
 
+                        Text("Затемнение фона: " + bgOverlayState.value.toInt() + "/255 (0=ярко, 255=тёмно)", fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
+                        Slider(value = bgOverlayState.value, onValueChange = { bgOverlayState.value = it }, valueRange = 0f..255f, modifier = Modifier.fillMaxWidth())
+
                         Button(
                             onClick = {
                                 stylePrefs.edit()
@@ -342,6 +346,7 @@ class ActivityMain : ComponentActivity() {
                                     .putInt("custom_mod_bg_alpha", modAlphaState.value.toInt())
                                     .putString("custom_longpress_color", longPressState.value.trim())
                                     .putString("custom_mod_text_color", modTextState.value.trim())
+                                    .putInt("bg_overlay_alpha", bgOverlayState.value.toInt())
                                     .apply()
                                 sendBroadcast(Intent("com.roalyr.customkeyboardengine.UPDATE_BACKGROUND"))
                                 Toast.makeText(this@ActivityMain, "Стиль применён", Toast.LENGTH_SHORT).show()
@@ -364,6 +369,7 @@ class ActivityMain : ComponentActivity() {
                                     .putInt("custom_mod_bg_alpha", 255)
                                     .putString("custom_longpress_color", "")
                                     .putString("custom_mod_text_color", "")
+                                    .putInt("bg_overlay_alpha", 120)
                                     .apply()
                                 bgColorState.value = ""
                                 textColorState.value = ""
@@ -374,6 +380,7 @@ class ActivityMain : ComponentActivity() {
                                 modAlphaState.value = 255f
                                 longPressState.value = ""
                                 modTextState.value = ""
+                                bgOverlayState.value = 120f
                                 sendBroadcast(Intent("com.roalyr.customkeyboardengine.UPDATE_BACKGROUND"))
                                 Toast.makeText(this@ActivityMain, "Стиль сброшен", Toast.LENGTH_SHORT).show()
                             },

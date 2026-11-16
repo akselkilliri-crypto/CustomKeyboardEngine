@@ -429,7 +429,8 @@ class CustomKeyboardView @JvmOverloads constructor(
         val _customModBg = _prefs.getString("custom_mod_bg_color", "") ?: ""
         val _modAlpha = _prefs.getInt("custom_mod_bg_alpha", 255).coerceIn(0, 255)
         val _customLongPress = _prefs.getString("custom_longpress_color", "") ?: ""
-        val _customModText = _prefs.getString("custom_mod_text_color", "") ?: ""
+        val _customModText = _prefs.getString("custom_mod_text_color", "") ?: 
+        val _bgOverlayAlpha = _prefs.getInt("bg_overlay_alpha", 120).coerceIn(0, 255)""
         if (_customKeyBg.isNotEmpty()) {
             ColorUtils.parseHexColor(_customKeyBg)?.let { keyBackgroundColor = it }
         }
@@ -489,7 +490,7 @@ class CustomKeyboardView @JvmOverloads constructor(
                     (bmp.height + srcH) / 2
                 )
                 canvas.drawBitmap(bmp, srcRect, dstRect, paint)
-                paint.color = Color.argb(120, 0, 0, 0)
+                paint.color = Color.argb(_bgOverlayAlpha, 0, 0, 0)
                 canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
             }
         } else {
