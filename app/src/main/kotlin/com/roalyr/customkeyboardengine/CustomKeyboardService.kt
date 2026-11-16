@@ -87,7 +87,7 @@ class CustomKeyboardService : InputMethodService() {
 
     private val bgUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            Handler(Looper.getMainLooper()).post { invalidateAllKeysOnAllKeyboards() }
+            Handler(Looper.getMainLooper()).post { floatingKeyboardView?.resetBackgroundCache(); keyboardView?.resetBackgroundCache(); invalidateAllKeysOnAllKeyboards() }
         }
     }
 

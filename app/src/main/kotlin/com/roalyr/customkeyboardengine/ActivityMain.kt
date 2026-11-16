@@ -416,7 +416,7 @@ class ActivityMain : ComponentActivity() {
                         ) { uri ->
                             if (uri != null) {
                                 try {
-                                    val dir = File(Constants.MEDIA_APP_DIRECTORY, "backgrounds")
+                                    val dir = File(filesDir, "backgrounds")
                                     if (!dir.exists()) dir.mkdirs()
                                     val target = File(dir, "background.img")
                                     contentResolver.openInputStream(uri)?.use { inp ->
@@ -440,7 +440,7 @@ class ActivityMain : ComponentActivity() {
 
                         Button(
                             onClick = {
-                                val f = File(Constants.MEDIA_APP_DIRECTORY, "backgrounds/background.img")
+                                val f = File(filesDir, "backgrounds/background.img")
                                 if (f.exists()) { f.delete(); sendBroadcast(Intent("com.roalyr.customkeyboardengine.UPDATE_BACKGROUND")); Toast.makeText(this@ActivityMain, "Фон удалён", Toast.LENGTH_SHORT).show() }
                             },
                             modifier = Modifier.fillMaxWidth(),

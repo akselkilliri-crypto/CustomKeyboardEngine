@@ -454,17 +454,22 @@ class CustomKeyboardView @JvmOverloads constructor(
 
 
         // Draw keyboard background (image if set, otherwise solid color)
-        val bgFile = File(Constants.MEDIA_APP_DIRECTORY, "backgrounds/background.img")
-        if (bgFile.exists()) {
-            if (bgBitmap == null || bgBitmapPath != bgFile.absolutePath || bgBitmapMtime != bgFile.lastModified()) {
+        val bgFile = File(context.filesDir, "backgrounds/background.img")
+        if (bgBitmapPath == null) {
+            if (bgFile.exists()) {
                 try {
                     bgBitmap = BitmapFactory.decodeFile(bgFile.absolutePath)
                     bgBitmapPath = bgFile.absolutePath
-                    bgBitmapMtime = bgFile.lastModified()
+                    Log.d("KeyboardBackground", "Loaded bg: " + bgFile.absolutePath + ", bitmap null=" + (bgBitmap == null))
                 } catch (e: Exception) {
                     Log.w("KeyboardBackground", "Failed to load bg: " + e.message)
+                    bgBitmapPath = "FAILED"
                 }
+            } else {
+                bgBitmapPath = "NONE"
             }
+        }
+        if (bgBitmap != null) {
             bgBitmap?.let { bmp ->
                 val dstRect = RectF(0f, 0f, width.toFloat(), height.toFloat())
                 val scale = maxOf(width.toFloat() / bmp.width, height.toFloat() / bmp.height)
@@ -771,6 +776,13 @@ class CustomKeyboardView @JvmOverloads constructor(
             val resId = context.resources.getIdentifier(iconName, "drawable", context.packageName)
             if (resId != 0) context.getDrawable(resId) else null
         }
+    }
+
+    fun resetBackgroundCache() {
+        bgBitmap = null
+        bgBitmapPath = null
+        bgBitmapMtime = 0L
+        invalidate()
     }
 
     fun invalidateAllKeys() {
